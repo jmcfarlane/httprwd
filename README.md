@@ -32,3 +32,18 @@ go run example/main.go
 curl -s localhost:8080
 curl -s localhost:8080/metrics
 ```
+
+## Tests
+
+```
+$ go test -v -cover -race
+=== RUN   TestResponseWriterDelegateStatusOK
+--- PASS: TestResponseWriterDelegateStatusOK (0.00s)
+=== RUN   TestResponseWriterDelegateStatusNotFound
+--- PASS: TestResponseWriterDelegateStatusNotFound (0.00s)
+=== RUN   TestResponseWriterDelegateStatusUnset
+--- PASS: TestResponseWriterDelegateStatusUnset (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/jmcfarlane/httprwd	1.012s
+```
