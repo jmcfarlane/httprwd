@@ -6,7 +6,7 @@ delegate that keeps track of the response code.
 ## Installation
 
 ```
-go get -d github.com/jmcfarlane/httprwd
+go get github.com/jmcfarlane/httprwd/...
 ```
 
 ## Usage
