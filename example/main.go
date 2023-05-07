@@ -10,12 +10,14 @@ import (
 
 	"github.com/jmcfarlane/httprwd"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
 	addr = flag.String("addr", ":8080", "The address to listen on for HTTP requests.")
 
-	handlerDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	handlerDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: "example",
 		Name:      "handler_duration_histogram_seconds",
 		Help:      "Histogram of http call duration",
@@ -39,14 +41,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello world")
 }
 
-func init() {
-	prometheus.MustRegister(handlerDuration)
-}
-
 func main() {
 	flag.Parse()
 	http.Handle("/", measure(index))
-	http.Handle("/metrics", prometheus.Handler())
+	http.Handle("/metrics", promhttp.Handler())
+	log.Println("Example listening on", *addr)
 	err := http.ListenAndServe(*addr, nil)
 	if err != nil {
 		log.Panic(err)

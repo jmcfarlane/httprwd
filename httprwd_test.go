@@ -20,9 +20,19 @@ var (
 	res      *http.Response
 	body     []byte
 	ts       = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		code, _ := strconv.Atoi(r.URL.Path[1:])
+		// The delegate is meant to be used exclusively inside middleware (is
+		// not intended to be thread safe). Here we reset before each test to
+		// simulate instantiation with each request, and do not use -race when
+		// running tests. If we wanted to do concurrent testing, we'd need to
+		// ensure the delegate is fully local to each request.
+		delegate.Code = 0
+
+		// Allow an empty code being passed, so we can test the unset case
+		code, err := strconv.Atoi(r.URL.Path[1:])
 		delegate.ResponseWriter = w
-		delegate.WriteHeader(code)
+		if err == nil {
+			delegate.WriteHeader(code)
+		}
 		delegate.Write([]byte(SAMPLE))
 	}))
 )
@@ -46,12 +56,10 @@ func TestResponseWriterDelegateStatusNotFound(t *testing.T) {
 }
 
 func TestResponseWriterDelegateStatusUnset(t *testing.T) {
-	res, err := http.Get(ts.URL + "/0")
-	// If golang is older than https://github.com/golang/go/commit/46069bed06551337bc8c9b293040d30e41917289
-	if err == nil {
-		body, err = ioutil.ReadAll(res.Body)
-		assert.Nil(t, err, "No errors reading")
-		assert.Equal(t, http.StatusOK, delegate.Code, "Status of 0 is 200")
-		assert.Equal(t, SAMPLE, string(body), UNCHANGED)
-	}
+	res, err := http.Get(ts.URL + "/")
+	assert.Nil(t, err, "No errors fetching")
+	body, err = ioutil.ReadAll(res.Body)
+	assert.Nil(t, err, "No errors reading")
+	assert.Equal(t, http.StatusOK, delegate.Code, "Status not set is 200")
+	assert.Equal(t, SAMPLE, string(body), UNCHANGED)
 }

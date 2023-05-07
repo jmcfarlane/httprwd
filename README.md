@@ -6,7 +6,7 @@ delegate that keeps track of the response code.
 ## Installation
 
 ```
-go get github.com/jmcfarlane/httprwd/...
+go get github.com/jmcfarlane/httprwd@latest
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ handlerDuration.WithLabelValues(
 ## Working example
 
 ```
-go run example/main.go
+make
 curl -s localhost:8080
 curl -s localhost:8080/metrics
 ```
@@ -36,7 +36,9 @@ curl -s localhost:8080/metrics
 ## Tests
 
 ```
-$ go test -v -cover -race
+$ make test
+go mod tidy
+go test -v -cover
 === RUN   TestResponseWriterDelegateStatusOK
 --- PASS: TestResponseWriterDelegateStatusOK (0.00s)
 === RUN   TestResponseWriterDelegateStatusNotFound
@@ -44,6 +46,6 @@ $ go test -v -cover -race
 === RUN   TestResponseWriterDelegateStatusUnset
 --- PASS: TestResponseWriterDelegateStatusUnset (0.00s)
 PASS
-coverage: 100.0% of statements
-ok  	github.com/jmcfarlane/httprwd	1.012s
+	github.com/jmcfarlane/httprwd	coverage: 100.0% of statements
+ok  	github.com/jmcfarlane/httprwd	0.003s
 ```
